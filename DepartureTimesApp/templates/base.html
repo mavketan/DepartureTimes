@@ -1,9 +1,14 @@
 <html>
   <head>
-    <title>This is Departure Time app!</title>
+    <title>
+	{% block titleBlock %}
+	{% endblock %}
+    </title>
+    {% block headBlock %} 
+    {% endblock %}   
   </head>
   <body>
-    <h1>Welcome!</h1>
+    <h1>Welcome to Real Time Departure App !</h1>
     {% block content %}
     {% endblock %} 
   </body>

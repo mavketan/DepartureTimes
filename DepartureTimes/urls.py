@@ -15,12 +15,18 @@ Including another URLconf
 """
 from django.conf.urls import include, url
 from django.contrib import admin
-from DepartureTimesApp.views import foo, foo1, foo2, foo3
+from DepartureTimesApp.views import foo, foo1, foo2, foo3, show_homepage, show_routes, show_directions, show_stops, show_predictions
 
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
-    url(r'DepartureTimesApp/$', foo),
+    #url(r'DepartureTimesApp/$', foo),
     url(r'DepartureTimesName/$', foo1),
     url(r'DepartureTimesTemplate/$', foo2),
-    url(r'DepartureTimesdDB/$', foo3),
+    url(r'DepartureTimesDB/$', foo3),
+
+    url(r'DepartureTimesApp/$', show_homepage),
+    url(r'show_routes/$', show_routes),
+    url(r'show_directions/$', show_directions),
+    url(r'show_stops/$', show_stops),
+    url(r'show_predictions/$', show_predictions),
 ]
