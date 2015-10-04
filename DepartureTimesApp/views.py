@@ -1,28 +1,76 @@
 from django.shortcuts import render, render_to_response
-from models import Line
+from models import Busstop, Stop
 import json
 import requests
 import xml.etree.ElementTree as ET
+import math
 
 # Create your views here.
 from django.http import HttpResponse
-def foo(request):
-    return HttpResponse("Departure Time App!")
 
-def foo1(request):
-    name = "Ketan"
-    html = "<html><body>Departure Time App! Hello from %s!</body></html>" % name
-    return HttpResponse(html)
+def get_nearest_busstops(lat1, lon1, r):
+    
+    all_busstops = Busstop.objects.all()
+    nearest_busstops = []
+    for bs in all_busstops:
+        lat2 = bs.lat
+        lon2 = bs.lon
+        dist = math.acos(math.sin(math.pi * lat1/180) * math.sin(math.pi * lat2/180) + math.cos(math.pi * lat1/180) * math.cos(math.pi * lat2/180) * math.cos(math.pi * (lon1-lon2)/180)) * 180/math.pi * 60 * 1.1515 * 1.609344
+        if dist <= r:
+            bs_tuple = (bs.stop_tag, bs.title, bs.lat, bs.lon, bs.stopId) ##
+            s_tuple_list = [] ##
+            for s in Stop.objects.all().filter(stop__stop_tag=bs.stop_tag):
+                agency = s.direction.route.agency.agency_tag
+                route_tag = s.direction.route.route_tag
+                direction_tag = s.direction.direction_tag
+                stop_tag = bs.stop_tag
+                #pred = get_predictions(agency, route_tag, direction_tag, stop_tag)
+                pred_string = ''
+                #if len(pred) == 0:
+                #    pred_string = 'No bus for selected route at this time'
+                #else:
+                #    pred_string = 'Predicted time for vehicles arriving:'
+                #    for t in pred:
+                #        pred_string = pred_string + t + 'minutes, ' 
+                s_tuple = (s.direction.title, s.direction.route.title, s.direction.route.agency.title, pred_string)##
+                s_tuple_list.append(s_tuple)    ##
+                #bs_tuple = (bs.stop_tag, bs.title, bs.lat, bs.lon, bs.stopId, s.direction.title, s.direction.route.title, s.direction.route.agency.title, pred_string) ##
+                #nearest_busstops.append(bs_tuple)##
+            busstop = (bs_tuple, s_tuple_list)
+            nearest_busstops.append(busstop)
+    
+    return nearest_busstops
 
-def foo2(request):
-    return render_to_response("home3.html",
-                {"Testing" : "Django Template Inheritance ",
-                "HelloHello" : "Departure Time App! Hello World - Django!"})
+def show_nearest_busstops(request):
 
-def foo3(request):
-    #return HttpResponse("Departure Time App!")
-    return render_to_response("home2.html",
-                {"lines" : Line.objects.all()})
+    lat1 = float(request.GET['lat'])
+    lon1 = float(request.GET['lon'])
+    r= float(request.GET['r'])
+    busstops = get_nearest_busstops(lat1, lon1, r)
+    #busstop_list = list(busstops.values_list('code', flat=True))
+    return HttpResponse(json.dumps(busstops), content_type='application/json')
+
+def show_map(request):
+    
+    lat1 = request.GET.get('lat', False)
+    lon1 = request.GET.get('lon', False)
+    if lat1 and lon1:
+        return render_to_response("map.html", {"lat":lat1, "lon":lon1})
+    else:
+        return render_to_response("map.html", {"lat":"0", "lon":"0"}); 
+
+def get_agencies():
+    
+    """ returns all available agencies """
+
+    xml_query_string = 'http://webservices.nextbus.com/service/publicXMLFeed?command=agencyList'
+    xml_request = requests.get(xml_query_string)
+    agencies = {}
+    root = ET.fromstring(xml_request.text)
+
+    for child in root:
+        agencies[child.attrib['tag']] = child.attrib['title']
+    return agencies
 
 def get_route_list(agency):
 
@@ -36,6 +84,17 @@ def get_route_list(agency):
     for child in root:
         routes[child.attrib['tag']] = child.attrib['title']
     return routes
+
+def get_route_details(agency, route_tag):
+
+    """ get complete route details """
+
+    xml_query_string = 'http://webservices.nextbus.com/service/publicXMLFeed?command=routeConfig&a='+agency+'&r='+route_tag
+    xml_request = requests.get(xml_query_string)
+    route_directions = {}
+    root = ET.fromstring(xml_request.text)
+    
+    return root
 
 def show_routes(request):
 
