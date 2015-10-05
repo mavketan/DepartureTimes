@@ -1,0 +1,36 @@
+h1 {
+font-size: 44px;
+font-family: Arial, Helvetica, sans-serif;
+color: #FFFFFE;
+}
+/*body {
+    color: #4DA1A3;
+    font-size: 14px;
+    font-family: Arial, Helvetica, sans-serif;
+}*/
+table, td, tr {
+	font: 14px Verdana, Arial, Helvetica, sans-serif;	
+	/*border: 1px solid black;*/
+    
+}
+a {
+	display: block;
+	float: left;
+	padding: 0px 20px 0px 20px;
+	text-transform: capitalize;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 14px;
+	font-weight: bold;
+	color: #4DA1A3;
+}
+b {
+	display: block;
+	float: left;
+	padding: 0px 20px 0px 20px;
+	text-transform: capitalize;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	font-weight: bold;
+	color: #4DA1A3;
+}
+
