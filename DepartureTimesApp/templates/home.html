@@ -161,8 +161,8 @@ function show_busstops(lat1, lon1, r, map) {
                 var marker2=new google.maps.Marker({
                         position:bus_loc,
                         //map:map
-                        {% load staticfiles %}
-                        icon:'{% static "DepartureTimesApp/busstop.png" %}',
+                        //{% load staticfiles %}
+                        //icon:'{% static "DepartureTimesApp/busstop.png" %}',
                         title:infowindow_title,
                         clickable: true
                 });
