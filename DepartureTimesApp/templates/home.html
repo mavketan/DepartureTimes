@@ -140,7 +140,7 @@ function show_busstops(lat1, lon1, r, map) {
 //            var marker2;
             if (result.length == 0) {
                 $("#stop_display").append('No stop found within ' + r + ' kilometer!');
-                $("#map_display").append('No stop found within ' + r + ' kilometer!');
+                //$("#map_display").append('No stop found within ' + r + ' kilometer!');
             }
             var k = 0;
             var marker_array;
@@ -285,6 +285,7 @@ function initialize_test() {
     show_busstops(lat1, lon1, 0.2, map);
 }
 google.maps.event.addDomListener(window, 'load', initialize);
+
 </script>
 
 {% endblock %}

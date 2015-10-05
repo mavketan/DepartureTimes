@@ -28,3 +28,7 @@ urlpatterns = [
     url(r'show_map/$', show_map),
     url(r'^$', show_homepage),
 ]
+
+urlpatterns += patterns('',
+    (r'^static/(?P.*)$', 'django.views.static.serve', {'document_root': settings.STATIC_ROOT}),
+)
