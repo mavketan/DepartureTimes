@@ -16,6 +16,8 @@ Including another URLconf
 from django.conf.urls import include, url
 from django.contrib import admin
 from DepartureTimesApp.views import show_homepage, show_routes, show_directions, show_stops, show_predictions, show_nearest_busstops, show_map
+from django.conf.urls import patterns
+from django.conf import settings
 
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
