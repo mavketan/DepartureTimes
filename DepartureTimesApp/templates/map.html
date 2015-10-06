@@ -76,9 +76,9 @@ function initialize() {
     map = new google.maps.Map(document.getElementById('googleMap'), mapProp);
     lat1 = Number({{ lat }});
     lon1 = Number({{ lon }});
-    //alert(lat1+':'+lon1);
+    alert('initial from url: '+lat1+':'+lon1);
     if (!(lat1==0 && lon1==0)) {
-        //alert(lat1+':'+lon1);
+        alert('if :'+lat1+':'+lon1);
         loc = new google.maps.LatLng(lat1, lon1);
         map.setCenter(loc);        
         var marker=new google.maps.Marker({
@@ -99,12 +99,12 @@ function initialize() {
         show_busstops(lat1, lon1, 0.2, map);
     }
     else {
-        //alert(lat1+':'+lon1);
+        alert('navigating...'+lat1+':'+lon1);
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(function (position) {
                 lat1 = position.coords.latitude;
                 lon1 = position.coords.longitude;
-                //alert(lat1+':'+lon1);
+                alert('found: '+lat1+':'+lon1);
                 myLocation = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
                 map.setCenter(myLocation);
              
@@ -127,7 +127,9 @@ function initialize() {
             });
             //alert(lat1+':'+lon1);
         }
-        //alert(lat1+':'+lon1);
+        else {
+            alert('navigation failed:'+lat1+':'+lon1);
+        }
     }
     //show_busstops(lat1, lon1, 0.2, map);
 }

@@ -134,15 +134,14 @@ def get_stops(agency, route_tag, direction_tag):
     """ returns stops for given route and direction """
     xml_query_string = 'http://webservices.nextbus.com/service/publicXMLFeed?command=routeConfig&a='+agency+'&r='+route_tag
     xml_request = requests.get(xml_query_string)
-    stops = {}
+    stops = []
     root = ET.fromstring(xml_request.text)
     for route in root:
         for child in route:
             if child.tag == 'direction':
                 if child.attrib['tag'] == direction_tag:
                     for stop in child:
-                        stops[stop.attrib['tag']] = stop.attrib['tag']
-                        #stops.append(stop.attrib['tag'])
+                        stops.append(stop.attrib['tag'])
     return stops
 
 def show_stops(request):
