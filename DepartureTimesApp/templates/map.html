@@ -46,8 +46,8 @@ function show_busstops(lat1, lon1, r, map) {
                 marker2=new google.maps.Marker({
                         position:bus_loc,
                         //map:map
-                        {% load staticfiles %}
-                        icon:'{% static "DepartureTimesApp/busstop.png" %}',
+                        //{% load staticfiles %}
+                        //icon:'{% static "DepartureTimesApp/busstop.png" %}',
                         title:infowindow_title
                 });
                 marker2.setMap(map);
@@ -113,7 +113,7 @@ function initialize() {
                 });
                 marker.setMap(map);
                 var circle = new google.maps.Circle({
-                    center:loc,
+                    center:myLocation,
                     radius:200,
                     strokeColor:"#0000FF",
                     strokeOpacity:0.8,
