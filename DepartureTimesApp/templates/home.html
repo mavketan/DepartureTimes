@@ -4,8 +4,8 @@ Real Time Bus Departure Homepage!!
 {% endblock %}
 
 {% block headBlock %}
-<script type="text/javascript" src="http://code.jquery.com/jquery-latest.min.js"></script>
-<script src="http://maps.googleapis.com/maps/api/js"></script>
+<script type="text/javascript" src="https://code.jquery.com/jquery-latest.min.js"></script>
+<script src="https://maps.googleapis.com/maps/api/js"></script>
 
 <script>
     $(document).ready(function(){
@@ -163,6 +163,7 @@ function show_busstops(lat1, lon1, r, map) {
                         //map:map
                         //{% load staticfiles %}
                         //icon:'{% static "DepartureTimesApp/busstop.png" %}',
+                        icon:'https://mapicons.mapsmarker.com/wp-content/uploads/mapicons/shape-default/color-9d7050/shapecolor-white/shadow-1/border-color/symbolstyle-color/symbolshadowstyle-no/gradient-no/busstop.png',
                         title:infowindow_title,
                         clickable: true
                 });
