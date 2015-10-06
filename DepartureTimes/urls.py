@@ -16,21 +16,15 @@ Including another URLconf
 from django.conf.urls import include, url
 from django.contrib import admin
 from DepartureTimesApp.views import show_homepage, show_routes, show_directions, show_stops, show_predictions, show_nearest_busstops, show_map
-#from django.conf.urls import patterns
-#from django.conf import settings
 
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
-    url(r'DepartureTimesApp/$', show_homepage),
+    #url(r'DepartureTimesApp/$', show_homepage),
     url(r'show_routes/$', show_routes),
     url(r'show_directions/$', show_directions),
     url(r'show_stops/$', show_stops),
     url(r'show_predictions/$', show_predictions),
     url(r'show_nearest_busstops/$', show_nearest_busstops),
-    url(r'show_map/$', show_map),
+    #url(r'show_map/$', show_map),
     url(r'^$', show_homepage),
 ]
-
-#urlpatterns += patterns('',
-#    (r'^static/(?P.*)$', 'django.views.static.serve', {'document_root': settings.STATIC_ROOT}),
-#)
