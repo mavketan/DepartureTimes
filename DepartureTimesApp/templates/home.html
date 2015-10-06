@@ -9,6 +9,20 @@ Real Time Bus Departure Homepage!!
 
 <script>
     $(document).ready(function(){
+        $( window ).load(function() {
+            $.ajax({ 
+                type: 'GET', 
+                url: '/show_routes',
+                data: {},
+                success: function (result) {
+                    console.log(result);
+                    $("#route_list option").remove();
+                    for (var key in result) {
+                        $("#route_list").append('<option value="' + key + '">' + result[key] + '</option>');
+                    };
+                }
+            });
+        });
         $('select#route_list').change(function () {
             var optionSelected = $(this).find("option:selected");
             var valueSelected  = optionSelected.val();
@@ -47,8 +61,10 @@ Real Time Bus Departure Homepage!!
                 success: function (result) {
                     console.log(result);
                     $("#stop_list option").remove();
-                    for (var i = result.length - 1; i >= 0; i--) {
-                        $("#stop_list").append('<option>'+ result[i] +'</option>');
+                    //for (var i = result.length - 1; i >= 0; i--) {
+                    for (var key in result) {
+                        $("#stop_list").append('<option value="' + key + '">' + result[key] + '</option>');
+                        //$("#stop_list").append('<option>'+ result[i] +'</option>');
                     };
                 }
             });
@@ -70,18 +86,18 @@ Real Time Bus Departure Homepage!!
             $.ajax({ 
                 type: 'GET', 
                 url: '/show_predictions',
-                data: {'RT' : routeValueSelected, 'DT' : directionValueSelected, 'ST' :  stop_tag},
+                data: {'RT' : routeValueSelected, 'DT' : directionValueSelected, 'ST' :  valueSelected},
                 success: function (result) {
                     console.log(result);
                     //$("#prediction").remove();
                     $("#prediction").empty();
                     if (result.length == 0) {
-                        $("#prediction").append('Prediction time not available for selected route at this time!');
+                        $("#prediction").append('No bus for selected route at this time!');
                     }
                     else {
-                        $("#prediction").append('Predicted time for vehicles arriving:');
+                        $("#prediction").append('<b>For selected route bus arriving in:</b>');
                         for (var i = 0; i<= result.length -1; i++) {
-                           $("#prediction").append(result[i]+' minutes, ');
+                           $("#prediction").append('</br>'+result[i]+' minutes');
                         };
                     };
                 }
@@ -92,54 +108,183 @@ Real Time Bus Departure Homepage!!
 
 <script>
 
-// Ref: http://www.w3schools.com/html/html5_geolocation.asp
 // Default Location
-var lat = 37.7694699;
-var lng = -122.42941;
+var lat1 = 37.7694699;
+var lon1 = -122.42941;
+var map;
 
+function add_info_window(marker, info) {
+  var infowindow = new google.maps.InfoWindow({
+    content: info
+  });
+
+  marker.addListener('click', function() {
+    infowindow.open(marker.get('map'), marker);
+  });
+}
+
+
+function show_busstops(lat1, lon1, r, map) {
+    alert('lat: ' + lat1 + 'lon: ' + lon1 + 'r: ' + r) 
+    data = {'lat' : lat1, 'lon' : lon1, 'r' : r };
+    $.ajax({ 
+        type: 'GET', 
+        url: '/show_nearest_busstops',
+        data: {'lat' : lat1, 'lon' : lon1, 'r' : r },
+        success: function (result) {
+            display_string = 'Showing nearest stops within ' + r + ' km from location(lat=' + lat1 + ', lon=' +lon1 + '):</br>';
+            $("#stop_display").append(display_string);
+            $("#map_display").append(display_string);
+            //$("#stop_display").append('Nearest stops'); //from location(lat='+lat1+'lon='+lon+'):</br>');
+            var bus_loc;
+//            var marker2;
+            if (result.length == 0) {
+                $("#stop_display").append('No stop found within ' + r + ' kilometer!');
+                $("#map_display").append('No stop found within ' + r + ' kilometer!');
+            }
+            var k = 0;
+            var marker_array;
+            var info_array;
+            for (var i = result.length - 1; i >= 0; i--) {
+                var stop_info = 'stop_tag: ' + result[i][0][0]+ ' title: '+ result[i][0][1] + ' lat: '+ result[i][0][2] + ' lon: '+ result[i][0][3]+' stop_Id: '+ result[i][0][4] + '</br> ';
+                var infowindow_content =  '<u><b>'+ result[i][0][1] +'</b></u>';
+                var infowindow_title = result[i][0][1];
+                $("#stop_display").append('<b>'+infowindow_content+'</b></br>');
+                
+                for (var j = result[i][1].length - 1; j >= 0; j--) {
+                    var stop_details = 'Agency: ' +result[i][1][j][2] + ' Route: ' + result[i][1][j][1] + ' Direction: ' + result[i][1][j][0];
+                     infowindow_content = infowindow_content + '</br>' + '<b>Route:</b> ' + result[i][1][j][1] + ' <b>Direction:</b> ' + result[i][1][j][0];
+                    $("#stop_display").append(stop_details + '</br>');
+                }
+                    
+                bus_loc = new google.maps.LatLng(result[i][0][2], result[i][0][3]);
+                var marker2=new google.maps.Marker({
+                        position:bus_loc,
+                        //map:map
+                        //{% load staticfiles %}
+                        //icon:'{% static "DepartureTimesApp/busstop.png" %}',
+                        title:infowindow_title,
+                        clickable: true
+                });
+                marker2.setMap(map);
+                //infowindow_content = '<b>' +infowindow_content+'</b>'
+                add_info_window(marker2, infowindow_content);
+
+/*                marker_array[k] = marker2; 
+                alert('marker_array'+k) 
+                var infowindow = new google.maps.InfoWindow({
+                    content:infowindow_content
+                    //title:infowindow_title
+                });
+                info_array[k] = infowindow;
+                //k = k +1; 
+                //marker2.addListener('click', function() {
+                */
+                marker2.info = new google.maps.InfoWindow({
+                    content: infowindow_content
+                });
+
+                //google.maps.event.addListener(marker2, 'click', function() {
+                //        marker2.info.open(map, marker2);
+                        //info_array[k].open(map, marker_array[k]); 
+                //});
+                /*k = k + 1;
+                alert('k:'+k);
+                     //infowindow.open(map,marker2);
+*/
+                //}
+            };
+            
+        }
+    });
+}
+
+// Ref: http://www.w3schools.com/html/html5_geolocation.asp
 function initialize() {
-   var loc = new google.maps.LatLng(lat, lng);
+    var loc = new google.maps.LatLng(0, 0);
 
-   var mapProp = {
-        zoom: 15,
+    var mapProp = {
+        zoom: 17,
         center: loc,
         mapTypeId: google.maps.MapTypeId.ROADMAP
-   };
-   var map = new google.maps.Map(document.getElementById('googleMap'), mapProp);
-
-   if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(function (position) {
-            myLocation = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
-            map.setCenter(myLocation);
-             
-            var marker=new google.maps.Marker({
-                position:myLocation,
-            });
-            marker.setMap(map);
-             
-            var bus_loc = new google.maps.LatLng(lat+0.1, lng+0.1);
-            var marker2=new google.maps.Marker({
-                position:bus_loc,
-                {% load staticfiles %}
-                icon:'{% static "DepartureTimesApp/busstop.png" %}'
-            });
-
-            marker2.setMap(map);
-
+    };
+    map = new google.maps.Map(document.getElementById('googleMap'), mapProp);
+    lat1 = Number({{ lat }});
+    lon1 = Number({{ lon }});
+    alert('location from url:'+lat1+':'+lon1);
+    if (!(lat1==0 && lon1==0)) {
+        alert('if:'+lat1+':'+lon1);
+        loc = new google.maps.LatLng(lat1, lon1);
+        map.setCenter(loc);        
+        var marker=new google.maps.Marker({
+            position:loc,
         });
+        marker.setMap(map);
+        var circle = new google.maps.Circle({
+            center:loc,
+            radius:200,
+            strokeColor:"#0000FF",
+            strokeOpacity:0.8,
+            strokeWeight:2,
+            fillColor:"#0000FF",
+            fillOpacity:0.4
+        });
+
+        circle.setMap(map);
+        show_busstops(lat1, lon1, 0.2, map);
     }
-}
+    else {
+        alert('else:'+lat1+':'+lon1);
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(function (position) {
+                lat1 = position.coords.latitude;
+                lon1 = position.coords.longitude;
+                alert('navigation:'+lat1+':'+lon1);
+                myLocation = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+                map.setCenter(myLocation);
+             
+                var marker=new google.maps.Marker({
+                    position:myLocation,
+                });
+                marker.setMap(map);
+                var circle = new google.maps.Circle({
+                    center:myLocation,
+                    radius:200,
+                    strokeColor:"#0000FF",
+                    strokeOpacity:0.8,
+                    strokeWeight:2,
+                    fillColor:"#0000FF",
+                    fillOpacity:0.4
+                });
 
-function initialize_OLD() {
-  var mapProp = {
-    center:new google.maps.LatLng(51.508742,-0.120850),
-    zoom:5,
-    mapTypeId:google.maps.MapTypeId.ROADMAP
-  };
-  var map=new google.maps.Map(document.getElementById("googleMap"), mapProp);
-}
+                circle.setMap(map);
+                show_busstops(lat1, lon1, 0.2, map);       
+            });
+            //alert(lat1+':'+lon1);
+        }
+        //alert(lat1+':'+lon1);
+    }
+    //show_busstops(lat1, lon1, 0.2, map);
+}   
 
-//google.maps.event.addDomListener(window, 'load', initialize);
+function initialize_test() {
+    var loc = new google.maps.LatLng(lat1, lon1);
+
+    var mapProp = {
+        zoom: 18,
+        center: loc,
+        mapTypeId: google.maps.MapTypeId.ROADMAP
+    };
+    map = new google.maps.Map(document.getElementById('googleMap'), mapProp);
+
+    var marker=new google.maps.Marker({
+        position:loc,
+    });
+    marker.setMap(map);
+
+    show_busstops(lat1, lon1, 0.2, map);
+}
+google.maps.event.addDomListener(window, 'load', initialize);
 </script>
 
 {% endblock %}
@@ -150,28 +295,58 @@ function initialize_OLD() {
 </ul>
 <br/><br/>
 {% endcomment %}
-
-To get geoloacation based information click <a href="show_map/">here</a>
-</br>
-</br>
-Select route/direction/stop to get real time prediction (results are based on NextBus public xml feed)
-</br>
-</br>
-Routes: <select name="route_list" id="route_list">
-
-{% for route, route_name in routes.items %}
-<option value="{{ route }}">{{ route_name }} </option>
-{% endfor %}
-</option>
-</br>
-</select>
-</br>
-Direction: <select name="direction_list" id="direction_list">
-</select>
-</br>
-Stop: <select name="stop_list" id="stop_list">
-</select>
-<p id="prediction"></p>
-</br></br>
-<div id="googleMap" style="width:500px;height:380px;"></div>
+<table width="100%" style="height: 100%;" align="right" bgcolor="#4DA1A3">
+    <tr>
+        <td width="70%" bgcolor="#FFFFFF">
+            <table>
+                <tr>
+                    <p id="map_display"></p>
+                    <div id="googleMap" style="width:100%;height:95%;"></div>
+                </tr>
+            </table>
+        </td>
+        <td width="30%" valign="top" bgcolor="#FFFFFF">
+            </br>
+            </br>
+            Select route/direction/stop to get real time prediction for San Francisco Muni transist system 
+            </br>
+            <font size="1" color="blue">(results are based on NextBus public XML feed)</font>
+            
+            </br>
+            </br>
+            <table>
+                <tr>
+                    <td>Routes: </td>
+                    <td>
+                        <select name="route_list" id="route_list">
+                            <option disabled selected> -- select a route -- </option>
+                        {% for route, route_name in routes.items %}
+                            <option value="{{ route }}">{{ route_name }} </option>
+                        {% endfor %}
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Direction: </td>
+                    <td>
+                        <select name="direction_list" id="direction_list">
+                            <option disabled selected> -- select a route -- </option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Stop: </td>
+                    <td>
+                        <select name="stop_list" id="stop_list">
+                            <option disabled selected> -- select a direction -- </option>
+                        </select>
+                    </td>
+                </tr>
+            </table>
+            <p id="prediction"></p>
+            </br></br>
+            <!--<p id="stop_display"></p>-->
+        </td> 
+    </tr>
+</table>
 {% endblock %}

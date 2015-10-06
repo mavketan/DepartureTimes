@@ -1,5 +1,5 @@
 from django.shortcuts import render, render_to_response
-from models import Busstop, Stop
+from models import Agency, Route, Direction, Busstop, Stop
 import json
 import requests
 import xml.etree.ElementTree as ET
@@ -96,16 +96,45 @@ def get_route_details(agency, route_tag):
     
     return root
 
+def get_route_list_db(agency):
+
+    """ returns route list for agency from model """
+    
+    all_routes = Route.objects.filter(agency__agency_tag=agency)
+    routes = {}
+    for r in all_routes:
+        routes[r.route_tag] = r.title
+
+    return routes
+    
 def show_routes(request):
 
-    routes = get_route_list('sf-muni')
+    routes = get_route_list_db('sf-muni')
     return HttpResponse(json.dumps(routes), content_type='application/json')
 
 def show_homepage(request):
 
-    routes = get_route_list('sf-muni')
-    return render_to_response("home.html",
-                                {"routes" : routes})
+    #routes = get_route_list_db('sf-muni')
+    #return render_to_response("home.html",
+    #                            {"routes" : routes})
+    lat1 = request.GET.get('lat', False)
+    lon1 = request.GET.get('lon', False)
+    if lat1 and lon1:
+        return render_to_response("home.html", {"lat":lat1, "lon":lon1})
+    else:
+        return render_to_response("home.html", {"lat":"0", "lon":"0"}); 
+    
+
+def get_directions_db(agency, route_tag):
+
+    """ returns directions for given route_tag from model """
+    
+    all_directions = Direction.objects.filter(route__route_tag=route_tag)
+    route_directions = {}
+    for d in all_directions:
+        route_directions[d.direction_tag] = d.title
+
+    return route_directions
 
 def get_directions(agency, route_tag):
 
@@ -125,9 +154,21 @@ def get_directions(agency, route_tag):
 def show_directions(request):
 
     route_tag = request.GET['RT']
-    route_directions = get_directions('sf-muni', route_tag)
+    route_directions = get_directions_db('sf-muni', route_tag)
 
     return HttpResponse(json.dumps(route_directions), content_type='application/json')
+
+def get_stops_db(agency, route_tag, direction_tag):
+
+    """ returns stops for given route and direction from model """
+    
+    all_stops = Stop.objects.filter(direction__direction_tag=direction_tag)
+    stops = {}
+    for s in all_stops:
+        stops[s.stop.stop_tag] = s.stop.title
+        #stops.append(s.stop.title)
+
+    return stops
 
 def get_stops(agency, route_tag, direction_tag):
 
@@ -148,7 +189,7 @@ def show_stops(request):
 
     route_tag = request.GET['RT']
     direction_tag = request.GET['DT']
-    stops = get_stops('sf-muni', route_tag, direction_tag)
+    stops = get_stops_db('sf-muni', route_tag, direction_tag)
 
     return HttpResponse(json.dumps(stops), content_type='application/json')
 
