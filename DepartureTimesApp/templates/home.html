@@ -125,14 +125,14 @@ function add_info_window(marker, info) {
 
 
 function show_busstops(lat1, lon1, r, map) {
-    alert('lat: ' + lat1 + 'lon: ' + lon1 + 'r: ' + r) 
+    //alert('lat: ' + lat1 + 'lon: ' + lon1 + 'r: ' + r) 
     data = {'lat' : lat1, 'lon' : lon1, 'r' : r };
     $.ajax({ 
         type: 'GET', 
         url: '/show_nearest_busstops',
         data: {'lat' : lat1, 'lon' : lon1, 'r' : r },
         success: function (result) {
-            display_string = 'Showing nearest stops within ' + r + ' km from location(lat=' + lat1 + ', lon=' +lon1 + '):</br>';
+            display_string = 'Showing nearest stops within ' + r + ' km from location(lat=' + lat1 + ', lon=' +lon1 + '):';
             $("#stop_display").append(display_string);
             $("#map_display").append(display_string);
             //$("#stop_display").append('Nearest stops'); //from location(lat='+lat1+'lon='+lon+'):</br>');
@@ -140,7 +140,7 @@ function show_busstops(lat1, lon1, r, map) {
 //            var marker2;
             if (result.length == 0) {
                 $("#stop_display").append('No stop found within ' + r + ' kilometer!');
-                $("#map_display").append('No stop found within ' + r + ' kilometer!');
+                $("#map_display").append(' No stop found!');
             }
             var k = 0;
             var marker_array;
@@ -211,13 +211,14 @@ function initialize() {
     map = new google.maps.Map(document.getElementById('googleMap'), mapProp);
     lat1 = Number({{ lat }});
     lon1 = Number({{ lon }});
-    alert('location from url:'+lat1+':'+lon1);
+    //alert('location from url:'+lat1+':'+lon1);
     if (!(lat1==0 && lon1==0)) {
-        alert('if:'+lat1+':'+lon1);
+        //alert('if:'+lat1+':'+lon1);
         loc = new google.maps.LatLng(lat1, lon1);
         map.setCenter(loc);        
         var marker=new google.maps.Marker({
             position:loc,
+            animation: google.maps.Animation.DROP
         });
         marker.setMap(map);
         var circle = new google.maps.Circle({
@@ -234,17 +235,18 @@ function initialize() {
         show_busstops(lat1, lon1, 0.2, map);
     }
     else {
-        alert('else:'+lat1+':'+lon1);
+        //alert('else:'+lat1+':'+lon1);
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(function (position) {
                 lat1 = position.coords.latitude;
                 lon1 = position.coords.longitude;
-                alert('navigation:'+lat1+':'+lon1);
+                //alert('navigation:'+lat1+':'+lon1);
                 myLocation = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
                 map.setCenter(myLocation);
              
                 var marker=new google.maps.Marker({
                     position:myLocation,
+                    animation: google.maps.Animation.DROP
                 });
                 marker.setMap(map);
                 var circle = new google.maps.Circle({
