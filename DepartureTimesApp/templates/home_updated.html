@@ -9,6 +9,20 @@ Real Time Bus Departure Homepage!!
 
 <script>
     $(document).ready(function(){
+        $( window ).load(function() {
+            $.ajax({ 
+                type: 'GET', 
+                url: '/show_routes',
+                data: {},
+                success: function (result) {
+                    console.log(result);
+                    $("#route_list option").remove();
+                    for (var key in result) {
+                        $("#route_list").append('<option value="' + key + '">' + result[key] + '</option>');
+                    };
+                }
+            });
+        });
         $('select#route_list').change(function () {
             var optionSelected = $(this).find("option:selected");
             var valueSelected  = optionSelected.val();
@@ -47,8 +61,10 @@ Real Time Bus Departure Homepage!!
                 success: function (result) {
                     console.log(result);
                     $("#stop_list option").remove();
-                    for (var i = result.length - 1; i >= 0; i--) {
-                        $("#stop_list").append('<option>'+ result[i] +'</option>');
+                    //for (var i = result.length - 1; i >= 0; i--) {
+                    for (var key in result) {
+                        $("#stop_list").append('<option value="' + key + '">' + result[key] + '</option>');
+                        //$("#stop_list").append('<option>'+ result[i] +'</option>');
                     };
                 }
             });
@@ -70,7 +86,7 @@ Real Time Bus Departure Homepage!!
             $.ajax({ 
                 type: 'GET', 
                 url: '/show_predictions',
-                data: {'RT' : routeValueSelected, 'DT' : directionValueSelected, 'ST' :  stop_tag},
+                data: {'RT' : routeValueSelected, 'DT' : directionValueSelected, 'ST' :  valueSelected},
                 success: function (result) {
                     console.log(result);
                     //$("#prediction").remove();
