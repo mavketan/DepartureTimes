@@ -12,7 +12,7 @@ class Command(BaseCommand):
         self.add()
     
     def add_agency_info(self, a):
-        #print a.agency_tag
+        # Add all route/direction/stops for agency
         routes = get_route_list(a.agency_tag)
         print routes
         for rt in routes:
@@ -27,14 +27,16 @@ class Command(BaseCommand):
                 for child in route:
                     if child.tag == 'stop':
                         print 'create Busstop(stop_tag=' +child.attrib['tag']
-                        bs = Busstop(stop_tag=child.attrib['tag'], title=child.attrib['title'], lat=child.attrib['lat'], lon=child.attrib['lon'], stopId=child.attrib['stopId'])
+                        bs = Busstop(stop_tag=child.attrib['tag'], title=child.attrib['title'],
+                                     lat=child.attrib['lat'], lon=child.attrib['lon'], stopId=child.attrib['stopId'])
                         bs.save()
 
                 for child in route:
                     if child.tag == 'direction':
                         #r = Route.objects.get(route_tag=rt)
                         print 'create Direction(direction_tag=' +child.attrib['tag']
-                        d = Direction(route=r, direction_tag=child.attrib['tag'], title=child.attrib['title'], name=child.attrib['name'])
+                        d = Direction(route=r, direction_tag=child.attrib['tag'], title=child.attrib['title'],
+                                         name=child.attrib['name'])
                         d.save()
                         for direction_stop in child:
                             print 'create Stop(direction_tag=' + child.attrib['tag'] + ', stop_tag='+direction_stop.attrib['tag']
@@ -43,6 +45,7 @@ class Command(BaseCommand):
                             s.save()
                     
     def remove(self):
+        # Remove all data 
         print '-------------------Deleting all data-----------------'
         Agency.objects.all().delete()
         Route.objects.all().delete()
@@ -51,8 +54,8 @@ class Command(BaseCommand):
         Stop.objects.all().delete()
 
     def add(self):
+        # Add data for agency sf-muni
         agencies = get_agencies()
-        #print agencies
         print(len(agencies))
         total_routes = 0
         for at in agencies:
