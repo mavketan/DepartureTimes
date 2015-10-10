@@ -5,7 +5,7 @@ from DepartureTimesApp.models import Agency, Route, Direction, Busstop, Stop
 from DepartureTimesApp.views import get_agencies, get_route_list, get_route_details
 
 class Command(BaseCommand):
-    help = 'Populates db using NextBus API'
+    help = 'Populates database using NextBus API'
 
     def handle(self, *args, **options):
         self.remove()

@@ -10,7 +10,7 @@ from django.http import HttpResponse
 
 def get_nearest_busstops(lat1, lon1, r):
 
-    """ returns all nearest bustops with radius 'r' from loc(lat1, lon1) """
+    """ returns all nearest bustops with radius 'r' from location(lat1, lon1) """
     
     all_busstops = Busstop.objects.all()
     nearest_busstops = []

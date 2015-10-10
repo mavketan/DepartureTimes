@@ -148,7 +148,7 @@ function add_info_window(marker, info) {
 
 
 function show_busstops(lat1, lon1, r, map) {
-    // Get nearest bustops from loc (lat1, lon1) Display markers(stops) on map
+    // Get nearest bustops from location(lat1, lon1) Display markers/stops on map
     data = {'lat' : lat1, 'lon' : lon1, 'r' : r };
     $.ajax({ 
         type: 'GET', 

@@ -19,12 +19,10 @@ from DepartureTimesApp.views import show_homepage, show_routes, show_directions,
 
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
-    #url(r'DepartureTimesApp/$', show_homepage),
     url(r'show_routes/$', show_routes),
     url(r'show_directions/$', show_directions),
     url(r'show_stops/$', show_stops),
     url(r'show_predictions/$', show_predictions),
     url(r'show_nearest_busstops/$', show_nearest_busstops),
-    #url(r'show_map/$', show_map),
     url(r'^$', show_homepage),
 ]
