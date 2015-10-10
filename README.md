@@ -34,3 +34,4 @@ Try some examples,
 - Use PostreSQL (Current implementation uses default database SQLite)
 - Make html presentation better
 - Add error handling and logging 
+- Move JavaScript to /static/ file
